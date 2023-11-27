@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golang Chat with WebSockets</title>
+    <style>
+        .output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <pre id="output"></pre>
+
+    <div class="content">
+        <input type="text" id="input" onkeypress="if(event.keyCode == 13) send()">
+        <button onclick="send()">Send</button>
+    </div>
+
+    <script>
+        var output = document.querySelector("#output");
+        var input = document.querySelector("#input");
+        let socket = new WebSocket("ws://localhost:8080/ws");
+        console.log("Connecting to WebSocket server...");
+
+        socket.onopen = () => {
+            console.log("Connected to WebSocket server!");
+            output.innerHTML += "Status: Connected\n";
+        }
+
+        socket.onclose = (event) => {
+            console.log("Socket closed connection: ", event);
+        }
+
+        socket.onmessage = (event) => {
+            output.innerHTML += event.data + "\n";
+            console.log("Socket received message: ", event.data);
+        }
+
+        socket.onerror = (error) => {
+            console.log("Socket error: ", error);
+        }
+
+        function send() {
+            socket.send(input.value)
+            input.value = ""
+        }
+
+    </script>
+</body>
+</html>
